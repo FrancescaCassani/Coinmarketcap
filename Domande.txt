@@ -1,0 +1,49 @@
+1. La struttura di un progetto Nuxt include:
+
+   pages/: Contiene i file .vue che corrispondono alle rotte della tua applicazione.
+   components/: Contiene componenti Vue riutilizzabili. Questi componenti possono essere importati e utilizzati in diverse pagine o altri componenti.
+   layouts/: Contiene i layout che puoi usare per avvolgere le pagine. I layout possono avere una struttura e uno stile condivisi che si applicano a diverse pagine.
+   store/: Contiene i file per Pinia, il sistema di gestione dello stato globale. Puoi definire moduli Pinia per condividere i dati tra componenti.
+   middleware/: Contiene funzioni middleware che puoi usare per eseguire logiche prima di raggiungere una pagina, come autenticazione e autorizzazione.
+   static/: Contiene file statici come immagini e file di font.
+   nuxt.config.js: File di configurazione di Nuxt.js. Definisce le impostazioni globali per il tuo progetto, come le configurazioni di build, i plugin e i moduli.
+   assets/: Contiene file statici che devono essere elaborati da Webpack, come file CSS, SCSS e immagini.
+
+2. Occorre configurare Nuxt per l'hosting serverless all'interno del file nuxt.config.ts scegliendo tra i rendering di SSR oppure SSG (target:'server' | target:'static'), impostare la build
+   ed il deployment su Netlify, Vercel o altri servizi di hosting serverless. Quando si deploya un progetto Nuxt su un hosting serverless, è essenziale configurare correttamente il target
+   di rendering, ottimizzare le impostazioni di build e gestire le variabili d'ambiente.
+
+3. Per rendere le pagine di un'applicazione Nuxt visibili ai robot dei motori di ricerca come Google, è importante assicurarsi che il contenuto della pagina sia accessibile e interpretabile dai crawler.
+      Nuxt.js offre diversi strumenti e tecniche per ottimizzare la SEO e migliorare la visibilità sui motori di ricerca.
+      1- Rendering Lato Server (SSR) e Static Site Generation (SSG)
+      2- Meta Tags e SEO
+      3- Sitemap e Robots.txt
+      4- Ottimizzazione delle performance
+
+4. Per gestire il cambiamento di prezzo di una cryptovaluta dall'ultima volta in cui l'utente ne ha visto il valore, è possibile creare uno store in cui salvare l'ultimo valore della cryptovaluta e
+   confrontarlo con il valore attuale. Se il valore attuale è diverso da quello salvato, si può notificare l'utente del cambiamento di prezzo.
+
+5. Usa soluzione per gestire cosa e come far vedere determinati contenuti in base alla provenienza dell'utente può essere quella di recuperare l'indirizzo IP. Possiamo utilizzare Edge Functions su Netlify prima che la request
+   raggiunga il server:
+
+   import { Context } from "@netlify/edge-functions";
+
+     export default async (request: Request, context: Context) => {
+        const { geo } = context;
+        if (geo.country && geo.country.code !== 'IT') {
+            // Se non è dall'Italia, reindirizzo a una pagina di accesso negato
+            return new Response(null, {
+              status: 302,
+              headers: {
+                'Location': '/not-allowed'
+              }
+            });
+          }
+
+          // Se l'utente è dall'Italia, continua con la richiesta
+          return context.next();
+     };
+
+6. Per mettere in cache la tabella posso definire una CACHE_KEY e una CACHE_EXPIRY_KEY. Creare una funzione saveToCache che salvi i dati della tabella all'interno
+   dello store, poi richiamarla all'interno della mia funzione fetchCryptos. Se l'utente visita la pagina di nuovo entro quel periodo, verranno
+   utilizzati i dati memorizzati nella cache invece di fare una nuova richiesta all'API. Dopo 5 minuti, la cache scadrà e i dati verranno ricaricati di nuovo.
